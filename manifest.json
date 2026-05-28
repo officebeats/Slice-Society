@@ -1,0 +1,35 @@
+
+{
+  "name": "Slice-Society",
+  "short_name": "SliceSociety",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFF9F0",
+  "theme_color": "#FF5733",
+  "orientation": "portrait",
+  "description": "Slice-Society: The ultimate guide to Chicago's best pizza. Our Pizza Doughmocracy.",
+  "categories": ["food", "travel", "lifestyle"],
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=192&h=192&q=60",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=512&h=512&q=60",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+       "src": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1080&h=1920&q=60",
+       "sizes": "1080x1920",
+       "type": "image/jpeg",
+       "form_factor": "narrow"
+    }
+  ]
+}
