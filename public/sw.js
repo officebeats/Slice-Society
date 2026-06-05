@@ -1,9 +1,9 @@
 
 const CACHE_NAME = 'pizza-time-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+  './',
+  'index.html',
+  'manifest.json',
   // Styles & Fonts
   'https://cdn.tailwindcss.com?plugins=forms,typography,container-queries',
   'https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap',

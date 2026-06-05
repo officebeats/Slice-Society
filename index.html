@@ -6,7 +6,7 @@
     <title>Slice-Society</title>
     <meta name="description" content="Slice-Society: Chicago's Pizza Doughmocracy" />
     <meta name="theme-color" content="#FF5733" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="./manifest.json" />
     
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=192&h=192&q=60" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -179,7 +179,7 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+
 </head>
   <body class="bg-background-light text-black overflow-x-hidden min-h-[100dvh]">
     <div id="root"></div>
@@ -192,7 +192,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(registration => {
+          navigator.serviceWorker.register('./sw.js', { scope: './' }).then(registration => {
             console.log('SW registered: ', registration);
           }).catch(registrationError => {
             console.log('SW registration failed: ', registrationError);
@@ -200,6 +200,6 @@
         });
       }
     </script>
-  <script type="module" src="/index.tsx"></script>
+  <script type="module" src="./index.tsx"></script>
 </body>
 </html>

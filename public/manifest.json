@@ -2,8 +2,8 @@
 {
   "name": "Slice-Society",
   "short_name": "SliceSociety",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#FFF9F0",
   "theme_color": "#FF5733",

@@ -70,3 +70,34 @@ export enum PizzaStyle {
   PAN = "Pan Pizza",
   DETROIT = "Detroit Style"
 }
+
+export type OrderPlatform = 'SLICE' | 'DOORDASH' | 'PICKUP' | 'DELIVERY';
+
+export type OrderStatus = 'PLACED' | 'PREPARING' | 'BAKING' | 'OUT_FOR_DELIVERY' | 'READY_FOR_PICKUP' | 'COMPLETED';
+
+export interface OrderItem {
+  name: string;
+  size: 'Small' | 'Medium' | 'Large';
+  style: PizzaStyle;
+  toppings: string[];
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  placeId: string;
+  placeName: string;
+  placeAddress: string;
+  imageUrl: string;
+  items: OrderItem[];
+  subtotal: number;
+  tax: number;
+  deliveryFee?: number;
+  serviceFee: number;
+  dasherTip?: number;
+  total: number;
+  status: OrderStatus;
+  platform: OrderPlatform;
+  timestamp: string;
+  eta: number;
+}
