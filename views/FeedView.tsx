@@ -2,6 +2,8 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PIZZA_PLACES } from '../constants';
+import { ACTIVE_CITY } from '../cityConfig';
+import { COLORS } from '../theme';
 
 // Use the global Leaflet instance
 declare const L: any;
@@ -27,11 +29,11 @@ const FeedView: React.FC = () => {
     if (!mapContainerRef.current || mapRef.current) return;
     const map = L.map(mapContainerRef.current, {
         zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false, boxZoom: false, keyboard: false
-    }).setView([41.8781, -87.6298], 11);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+    }).setView([ACTIVE_CITY.center.lat, ACTIVE_CITY.center.lng], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
     
     PIZZA_PLACES.forEach(place => {
-       const color = place.rating > 4.5 ? '#FF5733' : '#FFD700';
+       const color = place.rating > 4.5 ? COLORS.primary : COLORS.secondary;
        const icon = L.divIcon({ 
          className: 'bg-transparent', 
          html: `
@@ -52,9 +54,17 @@ const FeedView: React.FC = () => {
     <div className="pt-8 pb-32 md:pb-8 px-4 w-full max-w-7xl mx-auto min-h-screen">
       <header className="mb-8 flex justify-between items-center sticky top-0 bg-background-light z-40 py-2">
         <div>
-          <h1 className="font-display text-5xl text-primary drop-shadow-[3px_3px_0_#000]">SLICE-SOCIETY</h1>
-          <p className="font-bold text-xs uppercase tracking-[0.2em] text-zinc-500 mt-1">CHICAGO'S PIZZA DOUGHMOCRACY</p>
+          <h1 className="font-display text-4xl sm:text-5xl text-primary drop-shadow-[3px_3px_0_#000]">SLICE-SOCIETY</h1>
+          <p className="font-bold text-xs uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mt-1">CHICAGO'S PIZZA DOUGHMOCRACY</p>
         </div>
+        <button
+          onClick={() => navigate('/history')}
+          aria-label="Pizza history and legends"
+          className="shrink-0 flex items-center gap-2 bg-white border-[3px] border-black rounded-xl px-3 sm:px-4 h-11 shadow-[3px_3px_0_0_#000] active:translate-y-0.5 active:shadow-none transition-all"
+        >
+          <span className="material-symbols-outlined text-black" aria-hidden="true">auto_stories</span>
+          <span className="font-display text-xs uppercase hidden sm:inline text-black">Legends</span>
+        </button>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -108,7 +118,7 @@ const FeedView: React.FC = () => {
 const FeedTag = ({ icon, label }: { icon: string, label: string }) => (
     <div className="flex flex-col items-center justify-center bg-white border-[3px] border-black rounded-xl py-2 px-1 shadow-[3px_3px_0_0_#000] group-hover:bg-zinc-50 transition-all">
         <span className="text-sm mb-1">{icon}</span>
-        <span className="text-[9px] font-black uppercase text-black truncate w-full text-center tracking-tighter">
+        <span className="text-[10px] font-black uppercase text-black truncate w-full text-center tracking-tighter">
           {label}
         </span>
     </div>
