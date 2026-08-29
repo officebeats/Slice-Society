@@ -1,8 +1,9 @@
 
 import { PizzaPlace, PizzaStyle } from '../types';
+import { ACTIVE_CITY } from '../cityConfig';
 
-// Chicago Bounding Box (Approximate for demo density)
-const BBOX = '41.85,-87.75,41.98,-87.60';
+// Bounding box for the active market (approximate for demo density)
+const BBOX = ACTIVE_CITY.overpassBbox;
 
 const OVERPASS_API_URL = 'https://overpass-api.de/api/interpreter';
 

@@ -186,10 +186,10 @@ const HistoryView: React.FC = () => {
        <header className="mb-6 flex justify-between items-center sticky top-0 bg-background-light/95 backdrop-blur z-40 py-2 border-b-2 border-black/10">
         <div>
           <h1 className="font-display text-2xl text-primary drop-shadow-[1px_1px_0_black] uppercase">SLICE-SOCIETY HISTORY</h1>
-          <p className="font-bold text-[9px] uppercase tracking-widest text-zinc-500">Legends of the Doughmocracy</p>
+          <p className="font-bold text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Legends of the Doughmocracy</p>
         </div>
-        <button className="w-8 h-8 bg-white border-[3px] border-black rounded-full flex items-center justify-center shadow-[2px_2px_0_0_black] active:translate-y-0.5 active:shadow-none transition-all">
-          <span className="material-symbols-outlined text-black text-lg">calendar_month</span>
+        <button aria-label="Timeline view" className="w-8 h-8 bg-white border-[3px] border-black rounded-full flex items-center justify-center shadow-[2px_2px_0_0_black] active:translate-y-0.5 active:shadow-none transition-all">
+          <span className="material-symbols-outlined text-black text-lg" aria-hidden="true">calendar_month</span>
         </button>
       </header>
 
@@ -210,6 +210,7 @@ const HistoryView: React.FC = () => {
                             <h2 className="font-display text-lg uppercase leading-none text-black">{place.name}</h2>
                             <button 
                                 onClick={() => handleAudioAction(place.id, place)}
+                                aria-label={activeItemId === place.id && (playbackState === 'playing' || playbackState === 'loading') ? `Stop narration of ${place.name}` : `Play narration of ${place.name}`}
                                 className={`
                                     w-8 h-8 rounded-full border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black] active:translate-y-0.5 active:shadow-none transition-all
                                     ${activeItemId === place.id ? 'bg-primary text-white animate-pulse' : 'bg-white text-black hover:bg-zinc-100'}
