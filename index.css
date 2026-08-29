@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-black: 0 0 0;
+    --color-white: 255 255 255;
+    --color-bg-light: 255 249 240;
+    --color-surface: 255 255 255;
+  }
+
+  /* Dark mode: a dark canvas with the signature light "sticker" cards kept
+     light so the bold-border comic aesthetic still pops. Page-level text that
+     sits directly on the background uses dark: utilities in components. */
+  .dark {
+    --color-bg-light: 24 24 27;
+    --color-surface: 38 38 38;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+@layer utilities {
+  .bold-border {
+    border: 3px solid rgb(var(--color-black));
+  }
+  .card-shadow {
+    box-shadow: 4px 4px 0 0 rgb(var(--color-black));
+  }
+  .bubble-shadow {
+    box-shadow: 3px 3px 0 0 rgb(var(--color-black));
+  }
+  .nav-border {
+    border-top: 5px solid rgb(var(--color-black));
+  }
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 1, "wght" 700, "GRAD" 0, "opsz" 24;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .chicago-star {
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    background-color: #ff0000;
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+  }
+
+  .text-sticker {
+    text-shadow:
+      1.5px 1.5px 0 #000,
+      -1.5px -1.5px 0 #000,
+      1.5px -1.5px 0 #000,
+      -1.5px 1.5px 0 #000,
+      0px 1.5px 0 #000,
+      0px -1.5px 0 #000,
+      1.5px 0px 0 #000,
+      -1.5px 0px 0 #000;
+  }
+
+  .sticker-base {
+    @apply text-white bold-border rounded-xl font-display uppercase bubble-shadow transition-all duration-200 flex items-center justify-center text-center;
+  }
+
+  /* Desaturate map tiles to match the muted comic palette while using
+     free, watermark-free OpenStreetMap tiles underneath. */
+  .map-desaturate .leaflet-tile-pane {
+    filter: grayscale(0.9) brightness(1.03) contrast(0.95);
+  }
+
+  /* Custom Range Slider */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    width: 100%;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: #e5e7eb;
+    height: 12px;
+    border-radius: 6px;
+    border: 3px solid rgb(var(--color-black));
+  }
+  .track-low::-webkit-slider-runnable-track {
+    background: #ff3131 !important;
+  }
+  .track-mid::-webkit-slider-runnable-track {
+    background: #ffa500 !important;
+  }
+  .track-high::-webkit-slider-runnable-track {
+    background: #22c55e !important;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -16px;
+    height: 40px;
+    width: 40px;
+    background-color: rgb(var(--color-white));
+    border: 4px solid rgb(var(--color-black));
+    border-radius: 50%;
+    box-shadow: 2px 2px 0 rgb(var(--color-black));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .seal-rotate {
+    animation: slow-rotate 20s linear infinite;
+  }
+  @keyframes slow-rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Cluster Styling Fixes */
+  .marker-cluster {
+    background-clip: padding-box;
+    border-radius: 50%;
+    background-color: transparent !important;
+  }
+  .marker-cluster div {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    text-align: center;
+    border-radius: 50%;
+    font-family: "Fredoka One", cursive;
+    font-size: 14px;
+    background-color: transparent !important;
+  }
+  .marker-cluster-small,
+  .marker-cluster-medium,
+  .marker-cluster-large {
+    background-color: transparent !important;
+  }
+}
+
+/* Respect users who prefer reduced motion: neutralize decorative loops
+   (spinning seal, pulses, bounces) and entrance animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .seal-rotate {
+    animation: none !important;
+  }
+}
