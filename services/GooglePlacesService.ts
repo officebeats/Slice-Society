@@ -212,10 +212,10 @@ const mapGoogleResultToPizzaPlace = (result: any): PizzaPlace => {
         } catch (e) {}
     }
 
-    const styles = [
+    const styles = Array.from(new Set([
         STYLES_POOL[Math.floor(rand1 * STYLES_POOL.length)],
         rand2 > 0.7 ? STYLES_POOL[Math.floor(rand2 * STYLES_POOL.length)] : null
-    ].filter(Boolean) as PizzaStyle[];
+    ].filter(Boolean) as PizzaStyle[]));
 
     const rawRating = result.rating || (3.0 + (rand1 * 2.0));
     const rating = Math.min(5, Math.floor(rawRating * 10) / 10);

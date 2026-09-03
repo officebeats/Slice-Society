@@ -54,8 +54,9 @@ export const OrdersProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [pastOrders]);
 
   // Order status advancement simulation
+  const hasActiveOrders = activeOrders.length > 0;
   useEffect(() => {
-    if (activeOrders.length === 0) return;
+    if (!hasActiveOrders) return;
 
     const interval = setInterval(() => {
       setActiveOrders((prevActive) => {
@@ -107,7 +108,7 @@ export const OrdersProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }, 10000); // Advance status every 10 seconds for testing simulation speed
 
     return () => clearInterval(interval);
-  }, [activeOrders]);
+  }, [hasActiveOrders]);
 
   const placeOrder = (
     platform: OrderPlatform,

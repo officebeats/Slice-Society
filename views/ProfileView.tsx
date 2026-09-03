@@ -128,7 +128,7 @@ const ProfileView: React.FC = () => {
         case '4': // Sauce Boss
             return PIZZA_PLACES.filter(p => p.stats.sauce >= 3).slice(0, 2);
         default: 
-            return PIZZA_PLACES.sort((a,b) => b.rating - a.rating).slice(0, 2);
+            return [...PIZZA_PLACES].sort((a,b) => b.rating - a.rating).slice(0, 2);
     }
   };
 
@@ -387,10 +387,10 @@ const ProfileView: React.FC = () => {
                 <div className="space-y-4">
                      {activeTab === 'reviews' && (
                         userReviews.length > 0 ? (
-                            userReviews.map((review, idx) => {
+                            userReviews.map((review) => {
                                 const place = PIZZA_PLACES.find(p => p.id === review.placeId);
                                 return (
-                                    <div key={idx} className="bg-white border-[3px] border-black p-4 rounded-2xl card-shadow">
+                                    <div key={review.id} className="bg-white border-[3px] border-black p-4 rounded-2xl card-shadow">
                                         <div className="flex gap-4 items-start">
                                             <div className="w-10 h-10 rounded-lg border-[3px] border-black overflow-hidden flex-shrink-0 bg-zinc-100">
                                                 <img src={place?.imageUrl || "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=100&q=60"} alt="Pizza" className="w-full h-full object-cover" />

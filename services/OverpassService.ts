@@ -94,10 +94,10 @@ const mapOverpassElementToPizzaPlace = (element: any): PizzaPlace => {
 
     const rating = Math.floor((3.0 + (rand1 * 2.0)) * 10) / 10;
     
-    const styles = [
+    const styles = Array.from(new Set([
       STYLES_POOL[Math.floor(rand1 * STYLES_POOL.length)],
       rand2 > 0.7 ? STYLES_POOL[Math.floor(rand2 * STYLES_POOL.length)] : null
-    ].filter(Boolean) as PizzaStyle[];
+    ].filter(Boolean) as PizzaStyle[]));
 
     const name = element.tags?.name || "Unknown Pizza";
     const street = element.tags?.['addr:street'];

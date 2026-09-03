@@ -139,6 +139,8 @@ const DetailsView: React.FC = () => {
     window.scrollTo(0, 0);
     const loadPlace = async () => {
       setIsLoading(true);
+      setPlace(null);
+      setSelectedStyleFilter('ALL');
       if (location.state?.place) { setPlace(location.state.place); setIsLoading(false); return; }
       const constantPlace = PIZZA_PLACES.find(p => p.id === id);
       if (constantPlace) { setPlace(constantPlace); setIsLoading(false); return; }

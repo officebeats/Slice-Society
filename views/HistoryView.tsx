@@ -98,6 +98,7 @@ const HistoryView: React.FC = () => {
   // Audio Refs
   const audioContextRef = useRef<AudioContext | null>(null);
   const streamPlayerRef = useRef<PCMStreamPlayer | null>(null);
+  const activeItemIdRef = useRef<string | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -116,6 +117,7 @@ const HistoryView: React.FC = () => {
     }
     setPlaybackState('idle');
     setActiveItemId(null);
+    activeItemIdRef.current = null;
   };
 
   const handleAudioAction = async (targetId: string, place: PizzaPlace) => {
@@ -140,6 +142,7 @@ const HistoryView: React.FC = () => {
 
     // 4. Start New Playback Session
     setActiveItemId(targetId);
+    activeItemIdRef.current = targetId;
     setPlaybackState('loading');
     
     streamPlayerRef.current = new PCMStreamPlayer(audioContextRef.current);
@@ -164,7 +167,7 @@ const HistoryView: React.FC = () => {
 
         let firstChunk = true;
         for await (const chunk of responseStream) {
-            if (!streamPlayerRef.current || activeItemId !== targetId) break;
+            if (!streamPlayerRef.current || activeItemIdRef.current !== targetId) break;
             const base64Audio = chunk.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
             if (base64Audio) {
                 if (firstChunk) {
@@ -178,6 +181,7 @@ const HistoryView: React.FC = () => {
         console.error("TTS Stream Error:", error);
         setPlaybackState('idle');
         setActiveItemId(null);
+        activeItemIdRef.current = null;
     }
   };
 

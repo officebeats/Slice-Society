@@ -196,7 +196,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: '1', name: 'Tavern King', description: 'Rate 5 Tavern Style spots', icon: 'local_pizza', color: 'bg-[#FFD700]', progress: 5, max: 5, isUnlocked: true },
   { id: '2', name: 'Deep Diver', description: 'Rate 5 Deep Dish spots', icon: 'pie_chart', color: 'bg-[#41B6E6]', progress: 3, max: 5, isUnlocked: false },
   { id: '3', name: 'City Explorer', description: 'Visit 3 different neighborhoods', icon: 'map', color: 'bg-[#FF5733]', progress: 2, max: 3, isUnlocked: false },
-  { id: '4', name: 'Sauce Boss', description: 'Rate Sauce > 9 three times', icon: 'soup_kitchen', color: 'bg-[#FF3131]', progress: 1, max: 3, isUnlocked: false },
+  { id: '4', name: 'Sauce Boss', description: 'Rate Sauce 3/3 three times', icon: 'soup_kitchen', color: 'bg-[#FF3131]', progress: 1, max: 3, isUnlocked: false },
   { id: '5', name: 'Paparazzi', description: 'Upload 10 photos of slices', icon: 'photo_camera', color: 'bg-[#98FB98]', progress: 10, max: 10, isUnlocked: true },
   { id: '6', name: 'Frequent Flyer', description: 'Visit 5 different pizza places', icon: 'flight_takeoff', color: 'bg-[#E879F9]', progress: 2, max: 5, isUnlocked: false }
 ];

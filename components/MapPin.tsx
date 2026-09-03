@@ -14,7 +14,7 @@ const MapPin: React.FC<MapPinProps> = ({ score, isActive = false, onClick, color
       className={`cursor-pointer transition-transform hover:scale-110 active:scale-95 flex flex-col items-center z-10 ${isActive ? 'z-20 scale-125' : ''}`}
       onClick={onClick}
     >
-      {showScore && score && (
+      {showScore && score !== undefined && score !== null && (
         <div className={`bg-secondary border-[3px] border-black px-2 py-0.5 rounded-lg bubble-shadow mb-1 ${isActive ? 'bg-white' : ''}`}>
           <span className="font-display text-xs text-black">{score}</span>
         </div>
