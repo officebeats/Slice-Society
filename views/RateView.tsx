@@ -5,6 +5,7 @@ import RatingSlider from '../components/RatingSlider';
 import { PizzaStyle, PizzaPlace } from '../types';
 import { PIZZA_PLACES } from '../constants';
 import { useReviews } from '../context/ReviewsContext';
+import { useToast } from '../context/ToastContext';
 import { fetchGooglePlaceDetails, searchGooglePlacesByQuery } from '../services/GooglePlacesService';
 import { fetchPizzaPlaceById } from '../services/OverpassService';
 
@@ -13,6 +14,7 @@ const RateView: React.FC = () => {
   const { id } = useParams();
   const location = useLocation();
   const { addReview } = useReviews();
+  const { showToast } = useToast();
   
   const [place, setPlace] = useState<PizzaPlace | null>(location.state?.place || null);
   const [style, setStyle] = useState<PizzaStyle>(PizzaStyle.TAVERN);
@@ -80,6 +82,7 @@ const RateView: React.FC = () => {
     });
 
     vibrate(20);
+    showToast('Review posted! +50 Flavor XP', { variant: 'reward', emoji: '🍕' });
     navigate(`/details/${place.id}`, { replace: true });
   };
 
@@ -132,7 +135,7 @@ const RateView: React.FC = () => {
                     <button onClick={() => navigate(-1)} className="w-10 h-10 bg-white border-[3px] border-black rounded-xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">
                         <span className="material-symbols-outlined text-black">arrow_back</span>
                     </button>
-                    <h1 className="font-display text-3xl uppercase">Rate a Slice</h1>
+                    <h1 className="font-display text-3xl uppercase text-black dark:text-white">Rate a Slice</h1>
                 </div>
             </header>
             <main className="px-6 max-w-lg mx-auto">
@@ -172,7 +175,7 @@ const RateView: React.FC = () => {
         </div>
 
         <div className="mb-4 mt-8 px-2 text-center">
-          <h1 className="font-display text-3xl leading-tight uppercase line-clamp-2">{displayPlace.name}</h1>
+          <h1 className="font-display text-3xl leading-tight uppercase line-clamp-2 text-black dark:text-white">{displayPlace.name}</h1>
           <div className="flex items-center justify-center gap-1 mt-1">
             <span className="material-symbols-outlined text-primary text-sm">location_on</span>
             <span className="font-bold text-xs text-zinc-600 uppercase tracking-wide">{displayPlace.location}</span>

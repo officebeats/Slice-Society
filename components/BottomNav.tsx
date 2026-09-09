@@ -16,8 +16,8 @@ const BottomNav: React.FC = () => {
   const getLabelClass = (path: string) => {
      const isActive = location.pathname === path;
      return isActive 
-       ? "text-[9px] font-black uppercase tracking-tighter text-primary"
-       : "text-[9px] font-black uppercase tracking-tighter text-black";
+       ? "text-[10px] font-black uppercase tracking-tighter text-primary"
+       : "text-[10px] font-black uppercase tracking-tighter text-black dark:text-white";
   };
 
   const getIconClass = (path: string) => {
@@ -37,14 +37,14 @@ const BottomNav: React.FC = () => {
          <span className="material-symbols-outlined text-white text-2xl">local_pizza</span>
       </div>
 
-      <button className="flex flex-col items-center w-14 group" onClick={() => navigate('/')}>
+      <button className="flex flex-col items-center w-14 group" onClick={() => navigate('/')} aria-label="Map" aria-current={location.pathname === '/' ? 'page' : undefined}>
         <div className={getButtonClass('/')}>
           <span className={`material-symbols-outlined ${getIconClass('/')}`}>map</span>
         </div>
         <span className={getLabelClass('/')}>Map</span>
       </button>
 
-      <button className="flex flex-col items-center w-14 group" onClick={() => navigate('/feed')}>
+      <button className="flex flex-col items-center w-14 group" onClick={() => navigate('/feed')} aria-label="Feed" aria-current={location.pathname === '/feed' ? 'page' : undefined}>
         <div className={getButtonClass('/feed')}>
           <span className={`material-symbols-outlined ${getIconClass('/feed')}`}>article</span>
         </div>
@@ -79,14 +79,14 @@ const BottomNav: React.FC = () => {
         </button>
       </div>
 
-      <button className="flex flex-col items-center w-14 group" onClick={() => navigate('/history')}>
-        <div className={getButtonClass('/history')}>
-          <span className={`material-symbols-outlined ${getIconClass('/history')}`}>auto_stories</span>
+      <button className="flex flex-col items-center w-14 group" onClick={() => navigate('/orders')} aria-label="Orders" aria-current={location.pathname === '/orders' ? 'page' : undefined}>
+        <div className={getButtonClass('/orders')}>
+          <span className={`material-symbols-outlined ${getIconClass('/orders')}`}>receipt_long</span>
         </div>
-        <span className={getLabelClass('/history')}>History</span>
+        <span className={getLabelClass('/orders')}>Orders</span>
       </button>
 
-      <button className="flex flex-col items-center w-14 group" onClick={() => navigate('/profile')}>
+      <button className="flex flex-col items-center w-14 group" onClick={() => navigate('/profile')} aria-label="Profile" aria-current={location.pathname === '/profile' ? 'page' : undefined}>
         <div className={getButtonClass('/profile')}>
           <span className={`material-symbols-outlined ${getIconClass('/profile')}`}>account_circle</span>
         </div>

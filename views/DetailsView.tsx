@@ -5,6 +5,8 @@ import { PIZZA_PLACES } from '../constants';
 import { useFavorites } from '../context/FavoritesContext';
 import { useRecentlyViewed } from '../context/RecentlyViewedContext';
 import { useReviews } from '../context/ReviewsContext';
+import { useOrders } from '../context/OrdersContext';
+import { useToast } from '../context/ToastContext';
 import { PizzaPlace, PizzaStyle, Review } from '../types';
 import { fetchGooglePlaceDetails } from '../services/GooglePlacesService';
 import { fetchPizzaPlaceById } from '../services/OverpassService';
@@ -101,7 +103,7 @@ const MiniStatBadge = ({ icon, label, score, mode }: { icon: string, label: stri
     return (
         <div className={`${bg} border-[2px] border-black rounded-lg px-2 py-0.5 flex items-center gap-1 shadow-[1.5px_1.5px_0_0_#000] rotate-1`}>
             <span className="text-[10px]">{icon}</span>
-            <span className="text-[8px] font-black uppercase text-white leading-none whitespace-nowrap">{label}</span>
+            <span className="text-[10px] font-black uppercase text-white leading-none whitespace-nowrap">{label}</span>
         </div>
     );
 };
@@ -134,6 +136,9 @@ const DetailsView: React.FC = () => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { addToRecentlyViewed } = useRecentlyViewed();
   const { getReviewsForPlace, getAverageRating, voteReview, getUserVote } = useReviews();
+  const { placeOrder } = useOrders();
+  const { showToast } = useToast();
+  const [showOrderSheet, setShowOrderSheet] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -160,9 +165,46 @@ const DetailsView: React.FC = () => {
     if (place) {
       try {
         if (navigator.share) await navigator.share({ title: place.name, text: `Check out ${place.name}!`, url: window.location.href });
-        else { await navigator.clipboard.writeText(window.location.href); alert('Link copied!'); }
+        else { await navigator.clipboard.writeText(window.location.href); showToast('Link copied to clipboard', { icon: 'link' }); }
       } catch (error) {}
     }
+  };
+
+  const handleToggleFavorite = () => {
+    if (!place) return;
+    const wasFavorite = isFavorite(place.id);
+    toggleFavorite(place.id);
+    showToast(wasFavorite ? 'Removed from saved' : 'Saved to your slices', {
+      icon: wasFavorite ? 'heart_broken' : 'favorite',
+      variant: wasFavorite ? 'default' : 'success',
+    });
+  };
+
+  const handleOrder = (platform: 'DELIVERY' | 'PICKUP') => {
+    if (!place) return;
+    const basePrice = 18.5 + place.stats.price * 3;
+    const subtotal = parseFloat(basePrice.toFixed(2));
+    const tax = parseFloat((subtotal * 0.1025).toFixed(2));
+    const deliveryFee = platform === 'DELIVERY' ? 3.99 : undefined;
+    const serviceFee = 2.5;
+    const total = parseFloat((subtotal + tax + (deliveryFee || 0) + serviceFee).toFixed(2));
+    placeOrder(
+      platform,
+      place.id,
+      place.name,
+      place.location,
+      place.imageUrl,
+      [{ name: `${place.styles[0]} Pizza`, size: 'Large', style: place.styles[0], toppings: ['Cheese'], price: subtotal }],
+      subtotal,
+      tax,
+      deliveryFee,
+      serviceFee,
+      undefined,
+      total,
+    );
+    setShowOrderSheet(false);
+    showToast('Order placed! Track it in Orders', { variant: 'success', icon: 'local_shipping' });
+    navigate('/orders');
   };
 
   const reviews = useMemo(() => place ? getReviewsForPlace(place.id) : [], [place, getReviewsForPlace]);
@@ -230,10 +272,12 @@ const DetailsView: React.FC = () => {
         </button>
         <h1 className="font-display text-2xl text-primary drop-shadow-[1px_1px_0_#000] uppercase tracking-tighter">SPOT DETAILS</h1>
         <button 
-            onClick={() => toggleFavorite(place.id)} 
+            onClick={handleToggleFavorite} 
+            aria-label={isFavorite(place.id) ? 'Remove from saved' : 'Save this spot'}
+            aria-pressed={isFavorite(place.id)}
             className={`w-11 h-11 border-[3px] border-black rounded-full flex items-center justify-center active:scale-95 transition-transform ${isFavorite(place.id) ? 'bg-primary' : 'bg-white'}`}
         >
-            <span className={`material-symbols-outlined font-black ${isFavorite(place.id) ? 'text-white' : 'text-primary'}`}>favorite</span>
+            <span className={`material-symbols-outlined font-black ${isFavorite(place.id) ? 'text-white' : 'text-primary'}`} aria-hidden="true">favorite</span>
         </button>
       </header>
 
@@ -244,35 +288,69 @@ const DetailsView: React.FC = () => {
                 <div className="absolute -bottom-3 -right-2 bg-secondary bold-border rounded-full p-4 flex flex-col items-center justify-center shadow-sm rotate-6 min-w-[100px] min-h-[100px]">
                     <span className="font-display text-4xl">{overallAvgRating}</span>
                     <StarRating rating={overallAvgRating} size="sm" />
-                    <span className="font-black text-[8px] uppercase tracking-tighter mt-1">{reviews.length} REVIEWS</span>
+                    <span className="font-black text-[10px] uppercase tracking-tighter mt-1">{reviews.length} REVIEWS</span>
                 </div>
             </div>
             <div className="flex-1 flex flex-col justify-center text-center md:text-left">
-                <h2 className="font-display text-4xl uppercase leading-none mb-2">{place.name}</h2>
+                <h2 className="font-display text-4xl uppercase leading-none mb-2 text-black dark:text-white">{place.name}</h2>
                 <p className="font-bold text-sm text-zinc-500 uppercase flex items-center justify-center md:justify-start gap-1"><span className="material-symbols-outlined text-primary text-sm">location_on</span>{place.location}</p>
                 <div className="grid grid-cols-2 gap-3 mt-6">
-                    <button onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`)} className="bg-secondary text-black bold-border h-12 rounded-xl font-display text-xs uppercase shadow-sm active:translate-y-0.5">Directions</button>
-                    <button onClick={handleShare} className="bg-white text-black bold-border h-12 rounded-xl font-display text-xs uppercase shadow-sm active:translate-y-0.5">Share</button>
+                    <button onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`)} aria-label={`Get directions to ${place.name}`} className="bg-secondary text-black bold-border h-12 rounded-xl font-display text-xs uppercase shadow-sm active:translate-y-0.5">Directions</button>
+                    <button onClick={handleShare} aria-label={`Share ${place.name}`} className="bg-white text-black bold-border h-12 rounded-xl font-display text-xs uppercase shadow-sm active:translate-y-0.5">Share</button>
                 </div>
             </div>
         </div>
 
-        <button 
-          onClick={() => navigate(`/rate/${place.id}`, { state: { place } })}
-          className="sticker-base w-full bg-primary h-[80px] text-xl sm:text-2xl active:translate-y-1 active:shadow-none hover:-translate-y-1 hover:shadow-lg transition-all"
-        >
-          <span className="text-sticker tracking-widest flex items-center justify-center gap-3">
-            <span className="material-symbols-outlined text-3xl">rate_review</span>
-            RATE & REVIEW THIS SLICE 🍕
-          </span>
-        </button>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button 
+            onClick={() => navigate(`/rate/${place.id}`, { state: { place } })}
+            className="sticker-base sm:col-span-2 w-full bg-primary h-[72px] text-lg sm:text-2xl active:translate-y-1 active:shadow-none hover:-translate-y-1 hover:shadow-lg transition-all"
+          >
+            <span className="text-sticker tracking-widest flex items-center justify-center gap-3">
+              <span className="material-symbols-outlined text-3xl" aria-hidden="true">rate_review</span>
+              RATE & REVIEW 🍕
+            </span>
+          </button>
+          <button
+            onClick={() => setShowOrderSheet(true)}
+            className="sticker-base w-full bg-chicago h-[72px] text-lg active:translate-y-1 active:shadow-none hover:-translate-y-1 hover:shadow-lg transition-all"
+          >
+            <span className="text-sticker tracking-widest flex items-center justify-center gap-2">
+              <span className="material-symbols-outlined text-2xl" aria-hidden="true">shopping_bag</span>
+              ORDER
+            </span>
+          </button>
+        </div>
+
+        {showOrderSheet && (
+          <div className="fixed inset-0 z-[300] flex items-end sm:items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowOrderSheet(false)}></div>
+            <div className="bg-white border-[5px] border-black rounded-[2rem] w-full max-w-sm p-6 relative z-10 card-shadow animate-in slide-in-from-bottom sm:zoom-in-95 duration-300">
+              <div className="text-center mb-5">
+                <h3 className="font-display text-2xl uppercase leading-none">How do you want it?</h3>
+                <p className="text-xs font-bold text-zinc-500 uppercase mt-1">{place.name}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => handleOrder('DELIVERY')} className="sticker-base bg-primary h-24 flex-col gap-1">
+                  <span className="material-symbols-outlined text-3xl" aria-hidden="true">local_shipping</span>
+                  <span className="text-sticker text-sm">DELIVERY</span>
+                </button>
+                <button onClick={() => handleOrder('PICKUP')} className="sticker-base bg-secondary !text-black h-24 flex-col gap-1">
+                  <span className="material-symbols-outlined text-3xl" aria-hidden="true">storefront</span>
+                  <span className="text-sm">PICKUP</span>
+                </button>
+              </div>
+              <button onClick={() => setShowOrderSheet(false)} className="mt-4 w-full py-3 border-[3px] border-black rounded-xl font-display text-sm uppercase hover:bg-zinc-50">Never Mind</button>
+            </div>
+          </div>
+        )}
 
         <section className="bg-white border-[6px] border-black rounded-[2rem] card-shadow overflow-hidden">
             <div className="bg-black py-4 px-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-3">
                     <h3 className="font-display text-xl uppercase text-white tracking-widest">THE BREAKDOWN</h3>
                     <div className="bg-chicago text-white px-3 py-1.5 rounded-xl border border-white/20 rotate-1 flex items-center gap-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.5)]">
-                        <span className="text-[8px] font-black uppercase whitespace-nowrap">
+                        <span className="text-[10px] font-black uppercase whitespace-nowrap">
                             {selectedStyleFilter === 'ALL' ? 'CONSENSUS' : selectedStyleFilter}:
                         </span>
                         <div className="flex items-center gap-1.5">
@@ -286,7 +364,7 @@ const DetailsView: React.FC = () => {
                   <div className="flex gap-2 w-full sm:w-auto overflow-x-auto hide-scrollbar pb-1 sm:pb-0">
                     <button 
                       onClick={() => setSelectedStyleFilter('ALL')}
-                      className={`text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border-[2px] border-white transition-all ${selectedStyleFilter === 'ALL' ? 'bg-white text-black' : 'text-white border-white/20 hover:border-white/40'}`}
+                      className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border-[2px] border-white transition-all ${selectedStyleFilter === 'ALL' ? 'bg-white text-black' : 'text-white border-white/20 hover:border-white/40'}`}
                     >
                       ALL
                     </button>
@@ -294,7 +372,7 @@ const DetailsView: React.FC = () => {
                       <button 
                         key={s}
                         onClick={() => setSelectedStyleFilter(s)}
-                        className={`text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border-[2px] border-white transition-all whitespace-nowrap ${selectedStyleFilter === s ? 'bg-white text-black' : 'text-white border-white/20 hover:border-white/40'}`}
+                        className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border-[2px] border-white transition-all whitespace-nowrap ${selectedStyleFilter === s ? 'bg-white text-black' : 'text-white border-white/20 hover:border-white/40'}`}
                       >
                         {s}
                       </button>
@@ -352,10 +430,10 @@ const DetailsView: React.FC = () => {
                                   <div className="flex-1 min-w-0">
                                       <div className="flex items-center flex-wrap gap-2">
                                           <h4 className="font-display text-sm uppercase text-black truncate">{rev.user}</h4>
-                                          {rev.isVerified && <div className="flex items-center gap-1 bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[8px] font-black uppercase border border-green-200">VERIFIED</div>}
-                                          {rev.style && <div className="bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded text-[8px] font-black uppercase border border-zinc-200">{rev.style}</div>}
+                                          {rev.isVerified && <div className="flex items-center gap-1 bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px] font-black uppercase border border-green-200">VERIFIED</div>}
+                                          {rev.style && <div className="bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded text-[10px] font-black uppercase border border-zinc-200">{rev.style}</div>}
                                           {rev.wouldReturn !== undefined && (
-                                              <div className={`px-2 py-0.5 rounded border-2 border-black text-[8px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000] rotate-1 ${rev.wouldReturn ? 'bg-rating-high text-white' : 'bg-rating-low text-white'}`}>
+                                              <div className={`px-2 py-0.5 rounded border-2 border-black text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000] rotate-1 ${rev.wouldReturn ? 'bg-rating-high text-white' : 'bg-rating-low text-white'}`}>
                                                 GOING BACK: {rev.wouldReturn ? 'HELL YEAH' : 'F#&% NO!'}
                                               </div>
                                           )}

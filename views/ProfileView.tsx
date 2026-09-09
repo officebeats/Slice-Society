@@ -7,6 +7,8 @@ import { useFavorites } from '../context/FavoritesContext';
 import { useFriends } from '../context/FriendsContext';
 import { useRecentlyViewed } from '../context/RecentlyViewedContext';
 import { useReviews } from '../context/ReviewsContext';
+import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
 
 const ProfileView: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +17,8 @@ const ProfileView: React.FC = () => {
   const { friends, addFriend, acceptRequest, removeFriend } = useFriends();
   const { recentlyViewed } = useRecentlyViewed();
   const { reviews } = useReviews();
+  const { theme, toggleTheme } = useTheme();
+  const { showToast } = useToast();
 
   // State
   const [isEditing, setIsEditing] = useState(false);
@@ -102,12 +106,14 @@ const ProfileView: React.FC = () => {
     if (!giftRecipient || !selectedGiftPlaceId) return;
     setTimeout(() => {
         setIsGiftSent(true);
+        showToast(`Slice sent to ${giftRecipient}!`, { variant: 'reward', emoji: '🎁' });
     }, 500);
   };
 
   const handleAddFriend = () => {
     if (newFriendName.trim()) {
         addFriend(newFriendName.trim());
+        showToast(`Request sent to ${newFriendName.trim()}`, { icon: 'group_add', variant: 'success' });
         setNewFriendName("");
     }
   };
@@ -140,11 +146,20 @@ const ProfileView: React.FC = () => {
       <header className="mb-6 flex justify-between items-center sticky top-0 bg-background-light z-40 py-2">
         <div>
           <h1 className="font-display text-3xl text-primary drop-shadow-[2px_2px_0_#000]">YOUR PROFILE</h1>
-          <p className="font-bold text-[9px] uppercase tracking-widest text-zinc-500">Member since '19</p>
+          <p className="font-bold text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Member since '19</p>
         </div>
-        <button className="w-10 h-10 bg-white border-[3px] border-black rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#000] active:translate-y-0.5 active:shadow-none transition-all">
-          <span className="material-symbols-outlined text-black">settings</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { toggleTheme(); showToast(theme === 'light' ? 'Night mode on' : 'Day mode on', { icon: theme === 'light' ? 'dark_mode' : 'light_mode' }); }}
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            className="w-10 h-10 bg-white border-[3px] border-black rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#000] active:translate-y-0.5 active:shadow-none transition-all"
+          >
+            <span className="material-symbols-outlined text-black" aria-hidden="true">{theme === 'light' ? 'dark_mode' : 'light_mode'}</span>
+          </button>
+          <button aria-label="Settings" className="w-10 h-10 bg-white border-[3px] border-black rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#000] active:translate-y-0.5 active:shadow-none transition-all">
+            <span className="material-symbols-outlined text-black" aria-hidden="true">settings</span>
+          </button>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -185,7 +200,7 @@ const ProfileView: React.FC = () => {
                     {isEditing ? (
                         <div className="w-full space-y-3 mb-6">
                             <div>
-                                <label className="font-bold text-[9px] uppercase tracking-wider ml-1 mb-1 block">Display Name</label>
+                                <label className="font-bold text-[10px] uppercase tracking-wider ml-1 mb-1 block">Display Name</label>
                                 <input 
                                     type="text" 
                                     value={editName} 
@@ -195,8 +210,8 @@ const ProfileView: React.FC = () => {
                             </div>
                             <div>
                                 <div className="flex justify-between ml-1 mb-1">
-                                    <label className="font-bold text-[9px] uppercase tracking-wider block">Bio</label>
-                                    <span className={`font-bold text-[9px] ${editBio.length > BIO_LIMIT ? 'text-red-500' : 'text-zinc-400'}`}>
+                                    <label className="font-bold text-[10px] uppercase tracking-wider block">Bio</label>
+                                    <span className={`font-bold text-[10px] ${editBio.length > BIO_LIMIT ? 'text-red-500' : 'text-zinc-400'}`}>
                                         {editBio.length}/{BIO_LIMIT}
                                     </span>
                                 </div>
@@ -256,17 +271,17 @@ const ProfileView: React.FC = () => {
                     <div className="flex w-full justify-between px-4">
                         <div className="flex flex-col items-center">
                             <span className="font-display text-2xl text-primary">{userReviews.length}</span>
-                            <span className="text-[9px] font-black uppercase tracking-widest">Reviews</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest">Reviews</span>
                         </div>
                         <div className="w-[3px] h-full bg-zinc-200"></div>
                         <div className="flex flex-col items-center">
                             <span className="font-display text-2xl text-black">{favorites.length}</span>
-                            <span className="text-[9px] font-black uppercase tracking-widest">Saved</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest">Saved</span>
                         </div>
                         <div className="w-[3px] h-full bg-zinc-200"></div>
                         <div className="flex flex-col items-center">
                             <span className="font-display text-2xl text-secondary">{acceptedFriends.length}</span>
-                            <span className="text-[9px] font-black uppercase tracking-widest">Friends</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest">Friends</span>
                         </div>
                     </div>
                 </div>
@@ -295,7 +310,7 @@ const ProfileView: React.FC = () => {
             {/* Recently Viewed Section */}
             {recentlyViewed.length > 0 && (
                 <section>
-                    <h3 className="font-display text-lg uppercase mb-3 px-2 flex items-center gap-2">
+                    <h3 className="font-display text-lg uppercase mb-3 px-2 flex items-center gap-2 text-black dark:text-white">
                         <span className="material-symbols-outlined text-primary">history</span> Freshly Viewed
                     </h3>
                     <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 px-1 snap-x">
@@ -307,14 +322,14 @@ const ProfileView: React.FC = () => {
                             >
                                 <div className="w-full h-24 rounded-xl border-[2px] border-black overflow-hidden mb-2 relative bg-zinc-100">
                                     <img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
-                                    <div className={`absolute top-1 right-1 text-[9px] font-bold px-1.5 py-0.5 rounded border border-black ${place.rating > 4.2 ? 'bg-primary text-white' : 'bg-secondary text-black'}`}>
+                                    <div className={`absolute top-1 right-1 text-[10px] font-bold px-1.5 py-0.5 rounded border border-black ${place.rating > 4.2 ? 'bg-primary text-white' : 'bg-secondary text-black'}`}>
                                         {place.rating}
                                     </div>
                                 </div>
                                 <h4 className="font-display text-xs uppercase leading-tight text-black truncate">{place.name}</h4>
                                 <div className="flex items-center gap-1 mt-1">
                                     <span className="material-symbols-outlined text-primary text-[10px]">location_on</span>
-                                    <span className="text-[9px] font-bold text-zinc-500 uppercase truncate max-w-[100px]">{place.location}</span>
+                                    <span className="text-[10px] font-bold text-zinc-500 uppercase truncate max-w-[100px]">{place.location}</span>
                                 </div>
                             </div>
                         ))}
@@ -325,7 +340,7 @@ const ProfileView: React.FC = () => {
             {/* Trophies/Badges */}
             <section>
                 <div className="flex justify-between items-center mb-3 px-2">
-                    <h3 className="font-display text-lg uppercase">Passport Stamps</h3>
+                    <h3 className="font-display text-lg uppercase text-black dark:text-white">Passport Stamps</h3>
                     <span 
                         onClick={() => setShowAllStamps(true)}
                         className="text-[10px] font-black uppercase underline cursor-pointer hover:text-primary active:scale-95 transition-transform"
@@ -355,14 +370,14 @@ const ProfileView: React.FC = () => {
                             </div>
                             <div className="flex flex-col items-center w-full z-10">
                                 <h4 className={`font-display text-sm uppercase leading-tight mb-1 ${badge.isUnlocked ? 'text-black' : 'text-zinc-500'}`}>{badge.name}</h4>
-                                <p className={`font-bold text-[9px] leading-tight mb-2 ${badge.isUnlocked ? 'text-black/70' : 'text-zinc-400'}`}>{badge.description}</p>
+                                <p className={`font-bold text-[10px] leading-tight mb-2 ${badge.isUnlocked ? 'text-black/70' : 'text-zinc-400'}`}>{badge.description}</p>
                                 <div className="w-full bg-white/50 h-2 rounded-full border-[2px] border-black/10 overflow-hidden relative">
                                     <div 
                                         className={`absolute left-0 top-0 bottom-0 ${badge.isUnlocked ? 'bg-black' : 'bg-zinc-400'}`} 
                                         style={{ width: `${(badge.progress / badge.max) * 100}%` }}
                                     ></div>
                                 </div>
-                                <span className="font-display text-[9px] mt-1 text-black/60">{badge.progress} / {badge.max}</span>
+                                <span className="font-display text-[10px] mt-1 text-black/60">{badge.progress} / {badge.max}</span>
                             </div>
                         </div>
                     </div>
@@ -442,11 +457,11 @@ const ProfileView: React.FC = () => {
                                             <h2 className="font-display text-xs uppercase leading-tight line-clamp-1">{place.name}</h2>
                                             <div className="flex items-center gap-1">
                                                 <span className="material-symbols-outlined text-primary text-[10px]">location_on</span>
-                                                <span className="font-bold text-[9px] text-zinc-500 uppercase line-clamp-1">{place.location}</span>
+                                                <span className="font-bold text-[10px] text-zinc-500 uppercase line-clamp-1">{place.location}</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <span className="bg-black text-white text-[8px] font-bold px-1.5 py-0.5 rounded border border-black uppercase truncate max-w-[80px]">
+                                            <span className="bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded border border-black uppercase truncate max-w-[80px]">
                                                 {place.styles[0]}
                                             </span>
                                         </div>
@@ -663,7 +678,7 @@ const ProfileView: React.FC = () => {
                              </div>
                              <div>
                                  <h4 className="font-display text-xs uppercase leading-tight mb-0.5 text-black">{badge.name}</h4>
-                                 <p className="font-bold text-[8px] text-black/60">{badge.progress} / {badge.max}</p>
+                                 <p className="font-bold text-[10px] text-black/60">{badge.progress} / {badge.max}</p>
                              </div>
                         </div>
                     ))}
@@ -718,7 +733,7 @@ const ProfileView: React.FC = () => {
                                         </div>
                                         <div>
                                             <h4 className="font-display text-sm uppercase leading-none text-black">{place.name}</h4>
-                                            <span className="text-[9px] font-bold text-zinc-500 uppercase">Start Quest →</span>
+                                            <span className="text-[10px] font-bold text-zinc-500 uppercase">Start Quest →</span>
                                         </div>
                                     </div>
                                 ))}
